@@ -1,8 +1,15 @@
-# Build stage - compile mdns-repeater
+# Build stage - compile mdns-repeater and download Docker CLI
 FROM gcc:latest AS builder
 ADD mdns-repeater.c /build/mdns-repeater.c
 WORKDIR /build
 RUN gcc -O3 -o mdns-repeater mdns-repeater.c -DHGVERSION="\"1\""
+
+# Download Docker CLI with API 1.44+ support from official static binaries
+# Docker 27.x supports API version 1.46 which is compatible with daemons requiring 1.44+
+RUN DOCKER_VERSION=27.4.0 \
+    && curl -fsSLk "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" -o /tmp/docker.tgz \
+    && tar -xzf /tmp/docker.tgz --strip-components=1 -C /tmp docker/docker \
+    && rm /tmp/docker.tgz
 
 # Final stage - lightweight Alpine  
 FROM alpine:3.19
@@ -10,9 +17,8 @@ FROM alpine:3.19
 # Copy compiled mdns-repeater from builder
 COPY --from=builder /build/mdns-repeater /bin/mdns-repeater
 
-# Add Docker CLI with API 1.44+ support from official static binaries
-# Docker 27.x supports API version 1.46 which is compatible with daemons requiring 1.44+
-ADD docker/docker /usr/local/bin/docker
+# Copy Docker CLI from builder stage
+COPY --from=builder /tmp/docker /usr/local/bin/docker
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
