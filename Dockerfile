@@ -1,15 +1,21 @@
+# Build stage - compile mdns-repeater
+FROM gcc:latest AS builder
+ADD mdns-repeater.c /build/mdns-repeater.c
+WORKDIR /build
+RUN gcc -O3 -o mdns-repeater mdns-repeater.c -DHGVERSION="\"1\""
 
-FROM alpine
+# Final stage - lightweight Alpine  
+FROM alpine:3.19
 
-ADD mdns-repeater.c mdns-repeater.c
+# Copy compiled mdns-repeater from builder
+COPY --from=builder /build/mdns-repeater /bin/mdns-repeater
 
-RUN apk add --no-cache build-base bash docker-cli \
-    && gcc -O3 -o /bin/mdns-repeater mdns-repeater.c -DHGVERSION="\"1\"" \
-    && apk del build-base \
-    && rm -rf /var/cache/apk/* /tmp/*
+# Add Docker CLI with API 1.44+ support from official static binaries
+# Docker 27.x supports API version 1.46 which is compatible with daemons requiring 1.44+
+ADD docker/docker /usr/local/bin/docker
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod a+x entrypoint.sh
+RUN chmod a+x /entrypoint.sh
 #ENV options="" hostNIC=eth0 dockerNIC=docker_gwbridge
 
 #CMD mdns-repeater -f ${options} ${hostNIC} ${dockerNIC}

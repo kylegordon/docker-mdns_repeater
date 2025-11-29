@@ -1,2 +1,4 @@
 qemu
 .idea/
+docker.tgz
+docker/
