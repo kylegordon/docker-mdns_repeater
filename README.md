@@ -7,6 +7,10 @@ The intended use of this container is to allow a docker-compose stack running in
 Image on Docker Hub: https://hub.docker.com/repository/docker/jdbeeler/mdns-repeater
 
 
+## Requirements
+
+- Docker daemon with API version 1.44 or higher (Docker Engine 25.0+)
+
 ## Using this container
 
 This container was designed to be used as part of a docker-compose stack. When creating the configuration file:
