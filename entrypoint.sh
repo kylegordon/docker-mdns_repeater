@@ -16,7 +16,7 @@ docker network ls
 
 # This searches the list of docker networks for the network name in order to get the ID, then (below) uses that ID
 # to infer the docker interface name.
-DOCKER_INTERFACE=$(docker network list | grep "${DOCKER_NETWORK_NAME}" | awk '{print $1}')
+DOCKER_INTERFACE=$(docker network ls | grep "${DOCKER_NETWORK_NAME}" | awk '{print $1}')
 
 echo "Docker network name: ${DOCKER_NETWORK_NAME}"
 echo "Docker bridge interface: br-${DOCKER_INTERFACE}"
