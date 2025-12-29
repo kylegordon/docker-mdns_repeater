@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      DOCKER_NETWORK_NAME: walled
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,7 +23,7 @@ jobs:
         run: docker build -t mdns-repeater:test .
       
       - name: Create Docker network for testing
-        run: docker network create walled
+        run: docker network create ${{ env.DOCKER_NETWORK_NAME }}
       
       - name: Run Docker container with env.sample
         run: |
@@ -46,4 +48,4 @@ jobs:
         run: |
           docker stop mdns-repeater-test || true
           docker rm mdns-repeater-test || true
-          docker network rm walled || true
+          docker network rm ${{ env.DOCKER_NETWORK_NAME }} || true
