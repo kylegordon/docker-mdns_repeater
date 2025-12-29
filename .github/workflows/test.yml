@@ -35,7 +35,8 @@ jobs:
           sleep 5
           
           # Check if the container is running
-          if [ "$(docker ps -a --filter name=mdns-repeater-test --format '{{.Names}}')" = "mdns-repeater-test" ]; then
+          echo "Checking container status..."
+          if [ "$(docker ps --filter name=mdns-repeater-test --format '{{.Names}}')" = "mdns-repeater-test" ]; then
             echo "Container started successfully"
             docker logs mdns-repeater-test
           else
@@ -43,6 +44,7 @@ jobs:
             docker logs mdns-repeater-test
             exit 1
           fi
+          echo "Test completed"
       
       - name: Cleanup
         if: always()
