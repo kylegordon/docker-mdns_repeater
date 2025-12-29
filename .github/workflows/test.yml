@@ -1,0 +1,54 @@
+name: Test Docker Build
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      DOCKER_NETWORK_NAME: walled
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Build Docker image
+        run: docker build -t mdns-repeater:test .
+      
+      - name: Create Docker network for testing
+        run: docker network create ${{ env.DOCKER_NETWORK_NAME }}
+      
+      - name: Run Docker container with env.sample
+        run: |
+          # Start the container in detached mode with the env.sample file
+          docker run -d --privileged --network host -v /var/run/docker.sock:/var/run/docker.sock --name mdns-repeater-test --env-file env.sample mdns-repeater:test
+          
+          # Wait a few seconds for the container to start
+          echo "Waiting..."
+          sleep 5
+          
+          # Check if the container is running
+          echo "Checking container status..."
+          if [ "$(docker ps --filter name=mdns-repeater-test --format '{{.Names}}')" = "mdns-repeater-test" ]; then
+            echo "Container started successfully"
+            docker logs mdns-repeater-test
+          else
+            echo "Container failed to start"
+            docker logs mdns-repeater-test
+            exit 1
+          fi
+          echo "Test completed"
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          docker stop mdns-repeater-test || true
+          docker rm mdns-repeater-test || true
+          docker network rm ${{ env.DOCKER_NETWORK_NAME }} || true

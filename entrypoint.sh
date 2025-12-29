@@ -5,9 +5,21 @@
 #DOCKER_NETWORK_NAME="fermentrack"
 #OPTIONS=""
 
+# Debug: Show docker context
+echo "Docker context list:"
+docker context ls
+
+# Debug: Show docker networks
+echo ""
+echo "Docker network list:"
+docker network ls
+
 # This searches the list of docker networks for the network name in order to get the ID, then (below) uses that ID
 # to infer the docker interface name.
-DOCKER_INTERFACE=$(docker network list | grep "${DOCKER_NETWORK_NAME}" | awk '{print $1}')
+DOCKER_INTERFACE=$(docker network ls | grep "${DOCKER_NETWORK_NAME}" | awk '{print $1}')
+
+echo "Docker network name: ${DOCKER_NETWORK_NAME}"
+echo "Docker bridge interface: br-${DOCKER_INTERFACE}"
 
 # Below is for future use in case I want to try to auto-detect the external interface
 #NON_VIRTUAL_INTERFACES=($(ip addr | grep "state UP" -A2 | awk '/inet/{print $(NF)}' | grep -P '^(?:(?!veth).)*$' | tr '\n' ' '))
