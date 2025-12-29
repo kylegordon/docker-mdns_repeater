@@ -31,10 +31,11 @@ jobs:
           docker run -d --privileged -v /var/run/docker.sock:/var/run/docker.sock --name mdns-repeater-test --env-file env.sample mdns-repeater:test
           
           # Wait a few seconds for the container to start
+          echo "Waiting..."
           sleep 5
           
           # Check if the container is running
-          if [ "$(docker ps --filter name=mdns-repeater-test --format '{{.Names}}')" = "mdns-repeater-test" ]; then
+          if [ "$(docker ps -a --filter name=mdns-repeater-test --format '{{.Names}}')" = "mdns-repeater-test" ]; then
             echo "Container started successfully"
             docker logs mdns-repeater-test
           else
