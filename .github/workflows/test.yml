@@ -23,7 +23,7 @@ jobs:
       - name: Run Docker container with env.sample
         run: |
           # Start the container in detached mode with the env.sample file
-          docker run -d --privileged --name mdns-repeater-test --env-file env.sample mdns-repeater:test
+          docker run -d --privileged -v /var/run/docker.sock:/var/run/docker.sock --name mdns-repeater-test --env-file env.sample mdns-repeater:test
           
           # Wait a few seconds for the container to start
           sleep 5
