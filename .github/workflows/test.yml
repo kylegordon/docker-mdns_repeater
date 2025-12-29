@@ -20,6 +20,9 @@ jobs:
       - name: Build Docker image
         run: docker build -t mdns-repeater:test .
       
+      - name: Create Docker network for testing
+        run: docker network create walled
+      
       - name: Run Docker container with env.sample
         run: |
           # Start the container in detached mode with the env.sample file
@@ -43,3 +46,4 @@ jobs:
         run: |
           docker stop mdns-repeater-test || true
           docker rm mdns-repeater-test || true
+          docker network rm walled || true
